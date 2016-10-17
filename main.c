@@ -42,10 +42,10 @@ void	set_to_zero(double *a, double *b, double *c, double *d)
 	*d = 0;
 }
 
-static void	do_f_julia(t_draw *draw, double x, double y)
+static int	frac_julia(t_draw *draw, double x, double y)
 {
 	int		i;
-	double	w;
+	double	w; // replace w and h by MACROS
 	double	h;
 
 	i = 0;
@@ -53,20 +53,19 @@ static void	do_f_julia(t_draw *draw, double x, double y)
 	h = HEIGHT;
 	draw->new_r = 1.5 * (x - w / 2) / (draw->zoom * w) + draw->move_x;
 	draw->new_i = (y - h / 2) / (draw->zoom * h) + draw->move_y;
-	while (i < draw->iter)
+	while (i++ < draw->iter)
 	{
 		draw->old_r = draw->new_r;
 		draw->old_i = draw->new_i;
-		draw->new_r = draw->old_r * draw->old_r - draw->old_i * draw->old_i + draw->c_r;
+		draw->new_r = /*pow(draw->old_r, 2)*/draw->old_r * draw->old_r - /*pow(draw->old_i, 2)*/draw->old_i * draw->old_i + draw->c_r;
 		draw->new_i = 2.0 * draw->old_r * draw->old_i + draw->c_i;
-		if ((draw->new_r * draw->new_r + draw->new_i * draw->new_i) > 4)
+		if ((/*pow(draw->new_r, 2)*/draw->new_r * draw->new_r + /*pow(draw->new_i, 2)*/draw->new_i * draw->new_i) > 4)
 			break ;
-		i++;
 	}
-	draw->color = i;
+	return (i);
 }
 
-static void	do_f_mandelbrot(t_draw *draw, double x, double y)
+static void	frac_mandelbrot(t_draw *draw, double x, double y)
 {
 	int		i;
 	double	w;
@@ -78,96 +77,50 @@ static void	do_f_mandelbrot(t_draw *draw, double x, double y)
 	draw->p_r = 1.5 * (x - w / 2) / (1 * draw->zoom * w) + draw->move_x;
 	draw->p_i = (y - h / 2) / (1 * draw->zoom * h) + draw->move_y;
 	set_to_zero(&draw->new_r, &draw->new_i, &draw->old_r, &draw->old_i);
-	while (i < draw->iter)
+	while (i++ < draw->iter)
 	{
 		draw->old_r = draw->new_r;
 		draw->old_i = draw->new_i;
-		draw->new_r = draw->old_r * draw->old_r - draw->old_i * draw->old_i + draw->p_r;
-		draw->new_i = 2.0 * draw->old_r * draw->old_i + draw->p_i + draw->p_i;
-		if ((draw->new_r * draw->new_r + draw->new_i * draw->new_i) > 4)
+		draw->new_r = /*pow(draw->old_r, 2)*/draw->old_r * draw->old_r - /*pow(draw->old_i, 2)*/draw->old_i * draw->old_i + draw->p_r;
+		draw->new_i = 2.0 * draw->old_r * draw->old_i + draw->p_i + draw->p_i; // draw->p_i * 2 ?
+		if ((/*pow(draw->new_r, 2)*/draw->new_r * draw->new_r + /*pow(draw->new_i, 2)*/draw->new_i * draw->new_i) > 4)
 			break ;
-		i++;
 	}
-	draw->color = i;
+	return (i);
 }
 
-static void	do_fractal(t_mlx *mlx, int id)
+static void	draw_fractal(t_mlx *mlx, int id)
 {
 	double x;
 	double y;
 
 	y = 0;
-	while (y <= WIDTH)
+	while (y++ <= WIDTH)
 	{
 		x = 0;
-		while (x <= HEIGHT)
+		while (x++ <= HEIGHT)
 		{
-			if (id == 1)
-				do_f_mandelbrot(mlx->draw, x, y);
-			else if (id == 2)
-				do_f_julia(mlx->draw, x, y);
+			//if (id == 'b')
+			//	draw->color = frac_burning(mlx->draw, x, y);
+			if (id == 'm')
+				draw->color = frac_mandelbrot(mlx->draw, x, y);
+			else if (id == 'j')
+				draw->color = frac_julia(mlx->draw, x, y);
 			pixel_to_image(mlx, x, y, mlx->draw->color);
-			x++;
 		}
-		y++;
 	}
 	mlx_put_image_to_window(mlx->mlx, mlx->win, mlx->img, 0, 0);
 }
 
-static void	display_param(void)
+static int		hook_expose(t_mlx *mlx)
 {
-	ft_putendl_fd("usage: ./fractol -fractal_type\n", 2);
-	ft_putendl_fd("-julia\n-mandelbrot\n-burning_ship", 2);
-	exit(1);
-}
-
-static void	init_draw(t_draw *draw)
-{
-	draw->iter = 20;
-	draw->zoom = 1;
-	draw->color = BLUE;
-	draw->move_x = 0;
-	draw->move_y = 0;
-	draw->p_r = 0;
-	draw->p_i = 0;
-	draw->c_r = -0.7;
-	draw->c_i = 0.27015;
-	draw->new_r = 0;
-	draw->new_i = 0;
-	draw->old_r = 0;
-	draw->old_i = 0;
-}
-
-static int	check_param(int ac, char **av)
-{
-	if (ac != 2)
-		display_param();
-	else
-	{
-		if (!ft_strcmp(av[1], "-mandelbrot"))
-			return (1);
-		else if (!ft_strcmp(av[1], "-julia"))
-			return (2);
-		else if (!ft_strcmp(av[1], "-burning_ship"))
-			return (3);
-		else
-		{
-			display_param();
-			return (0);
-		}
-	}
-	return (0);
-}
-
-static int		expose_hook(t_mlx *mlx)
-{
-	do_fractal(mlx, mlx->id);
+	draw_fractal(mlx, mlx->id);
 	return (0);
 }
 
 #include <stdio.h>
 
-static int		key_hook(int keycode, t_mlx *mlx)
+static int		hook_key(int keycode, t_mlx *mlx)
 {
 	printf("code = %d\n", keycode);
 	if (keycode == K_RIGHT)
@@ -203,7 +156,7 @@ static int	loop_hook(t_mlx *mlx)
 	if (mlx->hooked)
 	{
 		bzero(mlx->data, WIDTH * HEIGHT * mlx->bypp);
-		do_fractal(mlx, mlx->id);
+		draw_fractal(mlx, mlx->id);
 	}
 	mlx->hooked = 0;
 	return (0);
@@ -222,7 +175,7 @@ static int	zoom(int x, int y, double zoom, t_mlx *mlx)
 	return (1);
 }
 
-static int	mouse_button_hook(int button, int x, int y, t_mlx *mlx)
+static int	hook_mouse_button(int button, int x, int y, t_mlx *mlx)
 {
 	printf("button = %d\n", button); // test
 	mlx->hooked = 1;
@@ -233,7 +186,7 @@ static int	mouse_button_hook(int button, int x, int y, t_mlx *mlx)
 	return (0);
 }
 
-static int	mouse_motion_hook(int x, int y, t_mlx *mlx)
+static int	hook_mouse_motion(int x, int y, t_mlx *mlx)
 {
 	if (mlx->mouse_x != -1 && mlx->id == 2)
 	{
@@ -246,21 +199,57 @@ static int	mouse_motion_hook(int x, int y, t_mlx *mlx)
 	return (0);
 }
 
+static void	init_draw(t_draw *draw)
+{
+	draw->iter = 20;
+	draw->zoom = 1;
+	draw->color = BLUE;
+	draw->move_x = 0;
+	draw->move_y = 0;
+	draw->p_r = 0;
+	draw->p_i = 0;
+	draw->c_r = -0.7;
+	draw->c_i = 0.27015;
+	draw->new_r = 0;
+	draw->new_i = 0;
+	draw->old_r = 0;
+	draw->old_i = 0;
+}
+
 static void	init_mlx(t_mlx *mlx)
 {
 	mlx->hooked = 0;
 	mlx->mlx = mlx_init();
-	mlx->win = mlx_new_window(mlx->mlx, WIDTH, HEIGHT, "FRACTOL");
 	mlx->img = mlx_new_image(mlx->mlx, WIDTH, HEIGHT);
+	mlx->win = mlx_new_window(mlx->mlx, WIDTH, HEIGHT, "FRACTOL");
 	mlx->data = mlx_get_data_addr(mlx->img, &(mlx->bpp), &(mlx->line), &(mlx->endian));
 	mlx->bypp = mlx->bpp / 8;
 	mlx_loop_hook(mlx->mlx, loop_hook, mlx);
-	mlx_hook(mlx->win, 12, (1L<<15), expose_hook, mlx); // Expose, ExposureMask
-	mlx_hook(mlx->win, 2, (1L<<0), key_hook, mlx); // KeyPress, KeyPressMak
-	mlx_hook(mlx->win, 4, (1L<<2), mouse_button_hook, mlx); // ButtonPress, ButtonPressMask
-	mlx_hook(mlx->win, 6, (1L<<6), mouse_motion_hook, mlx); // MotionNotify, PointerMotionMask
+	mlx_hook(mlx->win, 12, (1L<<15), hook_expose, mlx);	// Expose
+	mlx_hook(mlx->win, 2, (1L<<0), hook_key, mlx);		// KeyPress
+	mlx_hook(mlx->win, 4, (1L<<2), hook_mouse_button, mlx); // ButtonPress
+	mlx_hook(mlx->win, 6, (1L<<6), hook_mouse_motion, mlx); // MotionNotify
 	mlx->mouse_x = -1;
 	mlx->mouse_y = -1;
+}
+
+static void	display_usage(void)
+{
+	ft_putendl_fd("\nusage: ./fractol [b | m | j]\n", 2);
+	ft_putendl_fd("-> b for burning ship", 2);
+	ft_putendl_fd("-> m for mandelbrot", 2);
+	ft_putendl_fd("-> j for julia\n", 2);
+	exit(1);
+}
+
+static int	check_param(int ac, char **av)
+{
+	char frac[3] = "bmj";
+
+	if (ac == 2 && av[1][1] == '\0' && (av[1] = ft_strstr(av[1], frac)))
+		return (av[1][0]);
+	display_usage();
+	return (0);
 }
 
 int			main(int ac, char **av)
@@ -268,12 +257,12 @@ int			main(int ac, char **av)
 	t_mlx	mlx;
 	t_draw	draw;
 
-	init_draw(&draw);
-	mlx.draw = &draw;
 	if ((mlx.id = check_param(ac, av)))
 	{
 		init_mlx(&mlx);
-		do_fractal(&mlx, mlx.id);
+		init_draw(&draw);
+		mlx.draw = &draw;
+		draw_fractal(&mlx, mlx.id);
 		mlx_loop(mlx.mlx);
 	}
 	return (0);
