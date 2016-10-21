@@ -6,27 +6,36 @@
 /*   By: adu-pelo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/29 12:27:51 by adu-pelo          #+#    #+#             */
-/*   Updated: 2016/10/20 20:08:26 by adu-pelo         ###   ########.fr       */
+/*   Updated: 2016/10/21 17:11:12 by adu-pelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/fractol.h"
 
-static void	init_draw(t_draw *draw)
+static void	init_draw(t_draw *draw, int id)
 {
-	draw->x = -1;
-	draw->y = -1;
+	draw->x = 0;
+	draw->y = 0;
+	draw->maxval = 4.0;
 	draw->z_r = 0;
 	draw->z_i = 0;
-	draw->c_r = -0.7;
-	draw->c_i = 0.27;
-	draw->m_r = 0;
-	draw->m_i = 0;
 	draw->a_r = 0;
 	draw->a_i = 0;
+	if (id == 'd')
+	{
+		draw->c_r = -0.123;
+		draw->c_i = -0.745;
+	}
+	else
+	{
+		draw->c_r = -0.7;
+		draw->c_i = 0.27;
+	}
+	draw->m_r = 0;
+	draw->m_i = 0;
 	draw->zoom = 0.005;
-	draw->iter = 50;
-	draw->color = BLUE;
+	draw->iter = 35;
+	draw->color = YELLOW;
 }
 
 static t_mlx	*init_mlx(t_mlx *mlx, int id)
@@ -70,7 +79,8 @@ static t_mlx	*init_mlx(t_mlx *mlx, int id)
 
 static void	display_usage(void)
 {
-	ft_putendl_fd("\nusage: ./fractol [d | m | j]\n", 2);
+	ft_putendl_fd("\nusage: ./fractol [b | d | m | j]\n", 2);
+	ft_putendl_fd("-> b for Burning Ship", 2);
 	ft_putendl_fd("-> d for Douady", 2);
 	ft_putendl_fd("-> m for Mandelbrot", 2);
 	ft_putendl_fd("-> j for Julia\n", 2);
@@ -79,7 +89,7 @@ static void	display_usage(void)
 
 static int	check_param(int ac, char **av)
 {
-	char frac[3] = "dmj";
+	char frac[4] = "bdmj";
 
 	if (ac == 2 && av[1][1] == '\0' && (av[1] = ft_strstr(frac, av[1])))
 		return (av[1][0]);
@@ -97,7 +107,7 @@ int			main(int ac, char **av)
 	{
 		mlx = NULL;
 		mlx = init_mlx(mlx, id);
-		init_draw(&draw);
+		init_draw(&draw, id);
 		mlx->draw = &draw;
 		draw_fractal(mlx, mlx->id);
 		mlx_loop(mlx->mlx);

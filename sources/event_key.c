@@ -6,7 +6,7 @@
 /*   By: adu-pelo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/10/20 19:10:37 by adu-pelo          #+#    #+#             */
-/*   Updated: 2016/10/20 20:08:00 by adu-pelo         ###   ########.fr       */
+/*   Updated: 2016/10/21 20:51:11 by adu-pelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,69 +19,91 @@ static void		set_color_mode(int *a, int *b, int *c, int set)
 	*c = (set == 3) ? 1 : 0;
 }
 
-#include <stdio.h>
-
-int		hook_key(int keycode, t_mlx *mlx)
+static void		arrow_moves(t_draw *draw, int keycode)
 {
-	printf("keycode = %d\n", keycode);
-	mlx->hooked = 1;
-	// moves
 	if (keycode == K_RIGHT)
-		mlx->draw->m_r -= 50;
+	{
+		draw->a_r -= 10 * draw->zoom;
+		draw->m_r -= 10 * draw->zoom;
+	}
 	else if (keycode == K_LEFT)
-		mlx->draw->m_r += 50;
+	{
+		draw->a_r += 10 * draw->zoom;
+		draw->m_r += 10 * draw->zoom;
+	}
 	else if (keycode == K_UP)
-		mlx->draw->m_i += 50;
+	{
+		draw->a_i += 10 * draw->zoom;
+		draw->m_i += 10 * draw->zoom;
+	}
 	else if (keycode == K_DOWN)
-		mlx->draw->m_i -= 50;
+	{
+		draw->a_i -= 10 * draw->zoom;
+		draw->m_i -= 10 * draw->zoom;
+	}
+}
+
+int		hook_key(int kc, t_mlx *mlx)
+{
+	mlx->hooked = 1;
+	
+	// moves
+	if (kc == K_RIGHT || kc == K_LEFT || kc == K_UP || kc == K_DOWN)
+		arrow_moves(mlx->draw, kc);
 
 	// iterations
-	else if (keycode == K_PLUS)
-		mlx->draw->iter++;
-	else if (keycode == K_MINUS)
-		mlx->draw->iter--;
+	else if (kc == K_PLUS || kc == K_MINUS)
+		mlx->draw->iter += ((kc == K_PLUS) ? 1 : -1);
 
 	// zooms
-	else if (keycode == K_PUP)
-		mlx->draw->zoom /= 1.1;
-	else if (keycode == K_PDOWN)
-		mlx->draw->zoom *= 1.1;
+	else if (kc == K_PUP || kc == K_PDOWN)
+		mlx->draw->zoom /= ((kc == K_PUP) ? 1.1 : 0.9);
 
 	// modes and colors
-	else if (keycode == K_1)
-		set_color_mode(&mlx->nm, &mlx->bw, &mlx->un, 1);
-	else if (keycode == K_2)
-		set_color_mode(&mlx->nm, &mlx->bw, &mlx->un, 2);
-	else if (keycode == K_3)
-		set_color_mode(&mlx->nm, &mlx->bw, &mlx->un, 3);
-	else if (keycode == K_4)
-		mlx->draw->color = BLUE;
-	else if (keycode == K_5)
-		mlx->draw->color = GREEN;
-	else if (keycode == K_6)
-		mlx->draw->color = VIOLET;
-	else if (keycode == K_7)
-		mlx->draw->color = ORANGE;
-	else if (keycode == K_8)
+	else if (kc == K_1)
+	{
 		mlx->draw->color = YELLOW;
-	else if (keycode == K_9)
+		set_color_mode(&mlx->nm, &mlx->bw, &mlx->un, 1);
+	}
+	else if (kc == K_2)
+		set_color_mode(&mlx->nm, &mlx->bw, &mlx->un, 2);
+	else if (kc == K_3)
+		set_color_mode(&mlx->nm, &mlx->bw, &mlx->un, 3);
+	else if (kc == K_4)
+		mlx->draw->color = BLUE;
+	else if (kc == K_5)
+		mlx->draw->color = GREEN;
+	else if (kc == K_6)
+		mlx->draw->color = VIOLET;
+	else if (kc == K_7)
+		mlx->draw->color = ORANGE;
+	else if (kc == K_8)
+		mlx->draw->color = YELLOW;
+	else if (kc == K_9)
 		mlx->draw->color = BROWN;
-	else if (keycode == K_F)
+	else if (kc == K_F)
 		mlx->friz = ((mlx->friz) ? 0 : 1);
 
 	// escape
-	else if (keycode == K_ESC)
+	else if (kc == K_ESC)
 		exit(0);
 
 	// fractal id
-	else if (keycode == K_D)
+	else if (kc == K_D)
+	{
+		mlx->draw->c_r = -0.123;
+		mlx->draw->c_i = -0.745;
 		mlx->id = 'd';
-	else if (keycode == K_J)
+	}
+	else if (kc == K_J)
+	{
+		mlx->draw->c_r = -0.7;
+		mlx->draw->c_i = 0.27;
 		mlx->id = 'j';
-	else if (keycode == K_M)
+	}
+	else if (kc == K_M)
 		mlx->id = 'm';
 	else
 		mlx->hooked = 0;
-	printf ("friz = %d\n", mlx->friz);
 	return (0);
 }

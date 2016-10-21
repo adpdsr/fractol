@@ -6,61 +6,59 @@
 /*   By: adu-pelo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/10/20 17:22:14 by adu-pelo          #+#    #+#             */
-/*   Updated: 2016/10/20 20:08:36 by adu-pelo         ###   ########.fr       */
+/*   Updated: 2016/10/21 20:24:02 by adu-pelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/fractol.h"
 
-typedef unsigned int uint;
-
 static uint	ft_rgb(short r, short g, short b)
 {
-	uint color;
+	uint col;
 
-	color = 0;
+	col = 0;
 	if (r < 0)
 		r = 0;
 	if (g < 0)
 		g = 0;
 	if (b < 0)
 		b = 0;
-	color = (color + r) << 8;
-	color = (color + g) << 8;
-	color = (color + b);
-	return (color);
+	col = (col + r) << 8;
+	col = (col + g) << 8;
+	col = (col + b);
+	return (col);
 }
 
-static void	pixel_put(t_mlx *mlx, int x, int y, uint color)
+static void	pixel_put(t_mlx *mlx, int x, int y, uint col)
 {
-	int         i;
-	char        c;
+	int		i;
+	char	c;
 
 	if (mlx->data && x < WIDTH && x >= 0 && y < HEIGHT && y >= 0)
 	{
 		i = x * (mlx->bpp / 8) + mlx->line * y;
 		if (mlx->endian == 0)
 		{
-			c = (color & 0xFF) >> 0;
+			c = (col & 0xFF) >> 0;
 			mlx->data[i] = c;
-			c = (color & 0xFF00) >> 8;
+			c = (col & 0xFF00) >> 8;
 			mlx->data[i + 1] = c;
-			c = (color & 0xFF0000) >> 16;
+			c = (col & 0xFF0000) >> 16;
 			mlx->data[i + 2] = c;
 		}
 		else
 		{
-			c = (color & 0xFF0000) >> 16;
+			c = (col & 0xFF0000) >> 16;
 			mlx->data[i] = c;
-			c = (color & 0xFF00) >> 8;
+			c = (col & 0xFF00) >> 8;
 			mlx->data[i + 1] = c;
-			c = (color & 0xFF) >> 0;
+			c = (col & 0xFF) >> 0;
 			mlx->data[i + 2] = c;
 		}
 	}
 }
 
-static void pixel_to_image(t_mlx *mlx, double x, double y, int c)
+static void	pixel_to_image(t_mlx *mlx, double x, double y, int c)
 {
 	int z;
 
@@ -80,8 +78,9 @@ static void pixel_to_image(t_mlx *mlx, double x, double y, int c)
 		}
 		else
 		{
-			z = mlx->draw->iter - c;
-			pixel_put(mlx, x, y, ft_rgb(z * 10, z * 20, z * 30));
+			z = mlx->draw->iter - c + (mlx->draw->color / (256 * 100));
+			pixel_put(mlx, x, y, \
+					ft_rgb(z * 600 / 256, z * 3000 / 256, z * 1000 / 256));
 		}
 	}
 }
