@@ -6,15 +6,15 @@
 /*   By: adu-pelo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/10/20 17:22:14 by adu-pelo          #+#    #+#             */
-/*   Updated: 2016/10/21 20:24:02 by adu-pelo         ###   ########.fr       */
+/*   Updated: 2016/10/22 15:18:07 by adu-pelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/fractol.h"
 
-static uint	ft_rgb(short r, short g, short b)
+static unsigned int	ft_rgb(short r, short g, short b)
 {
-	uint col;
+	unsigned int col;
 
 	col = 0;
 	if (r < 0)
@@ -29,7 +29,7 @@ static uint	ft_rgb(short r, short g, short b)
 	return (col);
 }
 
-static void	pixel_put(t_mlx *mlx, int x, int y, uint col)
+static void			pixel_put(t_mlx *mlx, int x, int y, unsigned int col)
 {
 	int		i;
 	char	c;
@@ -58,7 +58,7 @@ static void	pixel_put(t_mlx *mlx, int x, int y, uint col)
 	}
 }
 
-static void	pixel_to_image(t_mlx *mlx, double x, double y, int c)
+static void			pixel_to_image(t_mlx *mlx, double x, double y, int c)
 {
 	int z;
 
@@ -85,7 +85,7 @@ static void	pixel_to_image(t_mlx *mlx, double x, double y, int c)
 	}
 }
 
-void		draw_fractal(t_mlx *mlx, int id)
+void				draw_fractal(t_mlx *mlx, int id)
 {
 	int x;
 	int y;

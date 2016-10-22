@@ -6,83 +6,84 @@
 /*   By: adu-pelo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/10/20 14:57:14 by adu-pelo          #+#    #+#             */
-/*   Updated: 2016/10/21 20:51:16 by adu-pelo         ###   ########.fr       */
+/*   Updated: 2016/10/22 15:16:53 by adu-pelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/fractol.h"
 
-static void	frac_burnin(t_draw *draw, int x, int y)
-{
-	int		i;
-
-	i = 0;
-	x = (x + draw->a_r) / draw->zoom;
-	x = (x < 0) ? -x : x;
-	y = (y + draw->a_i) / draw->zoom;
-	y = (y < 0) ? -y : y;
-	while ((x > 0 || y > 0) && i++ < draw->iter)
-	{
-		if (x % 3 == 1 && y % 3 == 1)
-			break ;
-		x /= 3;
-		y /= 3;
-	}
-	draw->iteri = i;
-}
-
-static void	frac_julia(t_draw *draw, int x, int y)
+static void	frac_burnin(t_draw *d, int x, int y)
 {
 	int		i;
 	double	tmp;
 
 	i = 0;
-	draw->z_r = (x + draw->m_r - WIDTH / 2) * draw->zoom + draw->a_r;
-	draw->z_i = (y + draw->m_i - HEIGHT / 2) * draw->zoom + draw->a_r;
-	while (i++ < draw->iter && (draw->z_r * draw->z_r + draw->z_i * draw->z_i) < 4.0)
+	d->z_r = 0;
+	d->z_i = 0;
+	d->c_r = (x + d->m_r - WIDTH / 2) * d->zoom + d->a_r;
+	d->c_i = (y + d->m_i - HEIGHT / 2) * d->zoom + d->a_i;
+	while (i++ < d->iter && (pow(d->z_r, 2) + pow(d->z_i, 2) < d->maxval))
 	{
-		tmp = draw->z_r;
-		draw->z_r = pow(draw->z_r, 2) - pow(draw->z_i, 2) + draw->c_r;
-		draw->z_i = 2 * draw->z_i * tmp + draw->c_i;
-	}
-	draw->iteri = i;
-}
-
-static void	frac_mandel(t_draw *draw, int x, int y)
-{
-	int		i;
-	double	tmp;
-
-	i = 0;
-	draw->z_r = 0;
-	draw->z_i = 0;
-	draw->c_r = (x + draw->m_r - WIDTH / 2) * draw->zoom + draw->a_r;
-	draw->c_i = (y + draw->m_i - HEIGHT / 2) * draw->zoom + draw->a_i;
-	while (i++ < draw->iter && (draw->z_r * draw->z_r + draw->z_i * draw->z_i) < draw->maxval)
-	{
-		tmp = draw->z_r;
-		draw->z_r = draw->z_r * draw->z_r - draw->z_i * draw->z_i + draw->c_r;
-		draw->z_i = 2 * draw->z_i * tmp + draw->c_i;
-	}
-	draw->iteri = i;
-}
-
-static void	frac_douady(t_draw *draw, int x, int y)
-{
-	int		i;
-	double	tmp;
-
-	i = 0;
-	draw->z_r = (x + draw->m_r - WIDTH / 2) * draw->zoom + draw->a_r;
-	draw->z_i = (y + draw->m_i - HEIGHT / 2) * draw->zoom + draw->a_i;
-	while (i++ < draw->iter && (draw->z_r * draw->z_r + draw->z_i * draw->z_i) < 8.0)
-	{
-		tmp = draw->z_r;
-		draw->z_r = draw->z_r * draw->z_r - draw->z_i * draw->z_i + draw->c_r;
-		draw->z_i = 2 * draw->z_i * tmp + draw->c_i;
+		tmp = d->z_r;
+		d->z_r = 2 * fabs(d->z_r * d->z_i) + d->c_i;
+		d->z_i = d->z_i * d->z_i - tmp * tmp - d->c_r;
 		i++;
 	}
-	draw->iteri = i;
+	d->iteri = i;
+}
+
+static void	frac_julia(t_draw *d, int x, int y)
+{
+	int		i;
+	double	tmp;
+
+	i = 0;
+	d->z_r = (x + d->m_r - WIDTH / 2) * d->zoom + d->a_r;
+	d->z_i = (y + d->m_i - HEIGHT / 2) * d->zoom + d->a_r;
+	while (i++ < d->iter && (d->z_r * d->z_r + d->z_i * d->z_i) < 4.0)
+	{
+		tmp = d->z_r;
+		d->z_r = pow(d->z_r, 2) - pow(d->z_i, 2) + d->c_r;
+		d->z_i = 2 * d->z_i * tmp + d->c_i;
+	}
+	d->iteri = i;
+}
+
+static void	frac_mandel(t_draw *d, int x, int y)
+{
+	int		i;
+	double	tmp;
+
+	i = 0;
+	d->z_r = 0;
+	d->z_i = 0;
+	d->c_r = (x + d->m_r - WIDTH / 2) * d->zoom + d->a_r;
+	d->c_i = (y + d->m_i - HEIGHT / 2) * d->zoom + d->a_i;
+	while (i++ < d->iter && (d->z_r * d->z_r + d->z_i * d->z_i) < d->maxval)
+	{
+		tmp = d->z_r;
+		d->z_r = d->z_r * d->z_r - d->z_i * d->z_i + d->c_r;
+		d->z_i = 2 * d->z_i * tmp + d->c_i;
+	}
+	d->iteri = i;
+}
+
+static void	frac_douady(t_draw *d, int x, int y)
+{
+	int		i;
+	double	tmp;
+
+	i = 0;
+	d->z_r = (x + d->m_r - WIDTH / 2) * d->zoom + d->a_r;
+	d->z_i = (y + d->m_i - HEIGHT / 2) * d->zoom + d->a_i;
+	while (i++ < d->iter && (d->z_r * d->z_r + d->z_i * d->z_i) < 8.0)
+	{
+		tmp = d->z_r;
+		d->z_r = d->z_r * d->z_r - d->z_i * d->z_i + d->c_r;
+		d->z_i = 2 * d->z_i * tmp + d->c_i;
+		i++;
+	}
+	d->iteri = i;
 }
 
 void		select_fractal(t_draw *draw, int id, int x, int y)
