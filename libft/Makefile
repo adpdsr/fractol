@@ -6,7 +6,7 @@
 #    By: adu-pelo <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2015/12/01 18:10:51 by adu-pelo          #+#    #+#              #
-#    Updated: 2016/03/17 13:23:19 by adu-pelo         ###   ########.fr        #
+#    Updated: 2016/11/07 17:14:42 by adu-pelo         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -99,15 +99,15 @@ RM = rm -f
 all: $(NAME)
 
 $(NAME):
-	gcc $(CFLAGS) -c $(SRCS) -I libft.h
-	ar r $(NAME) $(OBJS)
-	ranlib $(NAME)
+	@gcc $(CFLAGS) -c $(SRCS) -I libft.h
+	@ar r $(NAME) $(OBJS)
+	@ranlib $(NAME)
 
 clean:
-	$(RM) $(OBJS)
+	@$(RM) $(OBJS)
 
 fclean: clean
-	$(RM) $(NAME)
+	@$(RM) $(NAME)
 
 re: fclean all
 
