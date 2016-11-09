@@ -6,7 +6,7 @@
 /*   By: adu-pelo <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/03/29 12:27:51 by adu-pelo          #+#    #+#             */
-/*   Updated: 2016/10/22 15:40:05 by adu-pelo         ###   ########.fr       */
+/*   Updated: 2016/11/09 14:40:46 by adu-pelo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ static void		display_usage(void)
 	ft_putendl_fd("page up		-> zoom in (center)", 2);
 	ft_putendl_fd("page down	-> zoom out (center)", 2);
 	ft_putendl_fd("pavnum nums	-> change color modes", 2);
-	ft_putendl_fd("mwheel down	-> zoom int (mouse pointer)", 2);
+	ft_putendl_fd("mwheel down	-> zoom in (mouse pointer)", 2);
 	ft_putendl_fd("mwheel up	-> zoom out (mouse pointer)", 2);
 	ft_putendl_fd("+		-> increase iteration number", 2);
 	ft_putendl_fd("-		-> decrease iteration number", 2);
